@@ -58,7 +58,7 @@ targets:
         CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
         LSApplicationCategoryType: public.app-category.utilities
-        NSHumanReadableCopyright: "Copyright © 2026 AppDrop. All rights reserved."
+        NSHumanReadableCopyright: "Copyright (C) 2026 我是艾文喵"
         LSMinimumSystemVersion: "14.0"
         CFBundleDocumentTypes:
           - CFBundleTypeName: Wishdrop Preset
@@ -109,7 +109,7 @@ targets:
         CFBundleVersion: "1"
         LSUIElement: true
         LSMinimumSystemVersion: "14.0"
-        NSHumanReadableCopyright: "Copyright © 2026 AppDrop. All rights reserved."
+        NSHumanReadableCopyright: "Copyright (C) 2026 我是艾文喵"
 schemes:
   AppDrop:
     build:

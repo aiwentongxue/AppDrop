@@ -8,7 +8,7 @@
 
 ![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue)
 ![Swift](https://img.shields.io/badge/swift-6-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
 ## Features
 
@@ -140,4 +140,5 @@ Issues and pull requests are welcome. Please make sure `swift test --package-pat
 
 ## License
 
-MIT License — see the [LICENSE](LICENSE) file for details.
+GNU General Public License v3.0 (GPL-3.0) — see the [LICENSE](LICENSE) file for details.  
+Copyright (C) 2026 我是艾文喵

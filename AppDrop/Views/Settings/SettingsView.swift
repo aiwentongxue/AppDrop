@@ -127,6 +127,9 @@ struct SettingsView: View {
 
             Section(AppStrings.string("settings.about")) {
                 LabeledContent("AppDrop", value: versionString)
+                Text("Copyright (C) 2026 我是艾文喵")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Text("App Group: \(SharedStore.resolvedGroupContainer?.identifier ?? SharedConstants.appGroupIdentifier) · Helper: \(SharedConstants.helperBundleIdentifier)")
                     .font(.caption)
                     .foregroundStyle(.secondary)

@@ -8,7 +8,7 @@
 
 ![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue)
 ![Swift](https://img.shields.io/badge/swift-6-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
 ## 功能特性
 
@@ -134,4 +134,5 @@ macOS 通知权限按进程独立：
 
 ## License
 
-MIT License — 详见 [LICENSE](LICENSE) 文件。
+GNU General Public License v3.0 (GPL-3.0) — 详见 [LICENSE](LICENSE) 文件。
+Copyright (C) 2026 我是艾文喵
