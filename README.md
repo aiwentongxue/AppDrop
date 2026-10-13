@@ -110,7 +110,7 @@ macOS 的通知权限按进程身份独立：
 ## 已知限制（诚实清单）
 
 - **签名与公证**：当前为个人团队（Personal Team）Apple Development 签名 + Xcode 托管描述文件，**未做 Developer ID 签名与公证**，仅适合本机/开发使用；对外分发需付费开发者账号。
-- **换到另一台 Mac 运行**：需要（1）放行 Gatekeeper（未公证）；（2）在“系统设置 → 隐私与安全性 → 完全磁盘访问权限”中允许 AppDrop 与 AppDrop Helper（个人团队签名下 App Group 容器受 TCC 保护）；（3）注意内嵌描述文件仅 7 天有效期，过期需重新构建。详见 [Documentation/build-and-run.md](Documentation/build-and-run.md) 的“分发到另一台 Mac”一节。
+- **换到另一台 Mac 运行**：请使用 `Scripts/make-shareable-build.sh` 生成的可分享构建（它会去掉只登记打包机的开发描述文件），然后（1）放行 Gatekeeper（未公证）；（2）在“系统设置 → 隐私与安全性 → 完全磁盘访问权限”中允许 AppDrop 与 AppDrop Helper（个人团队签名下 App Group 容器受 TCC 保护，添加后记得把开关拨到打开）。详见 [Documentation/build-and-run.md](Documentation/build-and-run.md) 的“分发到另一台 Mac”一节。
 - **本机额外授权**：个人团队签名下，macOS 27 的 Group Containers 受 TCC 保护，需在「系统设置 → 隐私与安全性 → 完全磁盘访问权限」中允许 AppDrop（与 AppDrop Helper）。若使用付费账号并启用 App Groups 能力，则无需该授权。
 - `StartInterval` 不保证准时；休眠/关机可能错过或延迟检查。
 - 不做汇率换算，不合并不同区域的“最低价”；同一应用不同区域为独立追踪项。

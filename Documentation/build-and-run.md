@@ -105,6 +105,18 @@ xcodebuild -exportArchive -archivePath /private/tmp/AppDrop.xcarchive \
 
 ## 分发到另一台 Mac（重要）
 
+### 先做“可分享构建”（`Scripts/make-shareable-build.sh`）
+
+正常 Archive 出来的 `.app` 里嵌着 Xcode 托管的**开发**描述文件，它的 `ProvisionedDevices` 只登记了打包这台 Mac，并且 7 天过期。这类构建在**别的 Mac 上会在启动前被系统拦下**（现象正是“应用程序“AppDrop”无法打开。”，进程根本没启动，因此按进程名过滤日志为空），Gatekeeper 放行与 `xattr -cr` 都不会改变结果。
+
+```bash
+Scripts/make-shareable-build.sh \
+  /private/tmp/AppDrop-Release-DD/Build/Products/Release/AppDrop.app \
+  /private/tmp/AppDrop-shareable/AppDrop.app
+```
+
+脚本会：复制一份产物 → 删除两份 `embedded.provisionprofile`（主 App 与 Helper）→ 用 Apple Development 证书 + entitlements 重新签名（保留沙盒与 App Group 权限）→ `codesign --verify --deep --strict` 自检。产物不再有设备限制与 7 天有效期问题。
+
 当前产物是**开发签名（个人团队）+ 未公证**，因此换一台 Mac 运行时有三道独立的关口，缺一不可：
 
 1. **Gatekeeper**：未公证的 App 会被拦截（提示“无法验证开发者/已损坏”）。`xattr -cr` 只清除隔离标记，不等于放行；需要在目标机器右键“打开”，或用 `sudo spctl --global-disable` 关闭 Gatekeeper。本机之所以一直能直接打开，是因为本机 Gatekeeper 已全局关闭（`spctl --status` → `assessments disabled`）。
