@@ -2262,13 +2262,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "First launch on another Mac? Grant Full Disk Access to AppDrop and AppDrop Helper in System Settings → Privacy & Security → Full Disk Access, then reopen the app. (This is required because this build is signed with a personal-team certificate: the App Group container is TCC-protected.)"
+            "value" : "First launch? Go to System Settings → Privacy & Security → Full Disk Access, add AppDrop and AppDrop Helper, then toggle them on and reopen the app. (This build is signed with a personal-team certificate; the App Group container is protected by TCC and therefore requires this permission.)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在另一台 Mac 首次运行？请到「系统设置 → 隐私与安全性 → 完全磁盘访问权限」中允许 AppDrop 与 AppDrop Helper，然后重新打开本应用。（本构建使用个人团队证书签名，而 App Group 容器受 TCC 保护，因此需要该授权。）"
+            "value" : "首次启动请到「系统设置 → 隐私与安全性 → 完全磁盘访问权限」中添加 AppDrop 与 AppDrop Helper，并将开关拨到打开，然后重新启动本应用。（本构建使用个人团队证书签名，App Group 容器受 TCC 保护，因此需要该授权。）"
           }
         }
       }
