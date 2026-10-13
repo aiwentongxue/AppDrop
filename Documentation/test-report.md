@@ -109,3 +109,21 @@ tail -20 ~/Library/Group\ Containers/group.com.appdrop.shared/AppDrop/helper.log
    - 单元测试：`swift test` 70 项通过（含 Mac 目录 entity、`kind` 过滤、默认平台、价格缺失时用 lookup 补全）。
 6. **最新产物**：`dist/AppDrop-1.0.0-macOS-universal.zip`，SHA-256 `f8b48b36a9e80b8b290fdb299bce5c71d51d742e5c5baf4dfccfb9f15ffe6630`；`/Applications/AppDrop.app` 为同一 Release 构建（deep-strict 通过）。
 
+## 9. “另一台 Mac 打不开”的诊断证据（2026-10-13 下午）
+
+用户在另一台 Mac 上（已放行 Gatekeeper 并执行 `xattr -cr`）仍无法打开 AppDrop。本机取证：
+
+1. **本机 Gatekeeper 已全局关闭**：`spctl --status` → `assessments disabled`；`spctl --assess` 对 AppDrop 返回 `accepted (override=security disabled)`。也就是说本机能直接打开并不代表别处也行；未公证的 App 在默认 Gatekeeper 下会被拦，`xattr -cr` 只清除隔离标记。
+2. **内嵌描述文件不含 App Groups 能力**：`security cms -D -i AppDrop.app/Contents/embedded.provisionprofile` 的 `Entitlements` 只有 `application-identifier`、`team-identifier`、`keychain-access-groups`。而数据库在 TCC 保护的 App Group 容器内 → 目标机必须授予“完全磁盘访问权限”，否则启动后停在“无法打开共享数据库”。（本机已授予，故可用。）
+3. **描述文件 7 天有效且只登记本机**：`ExpirationDate = 2026-10-20 05:16 UTC`、`TimeToLive = 7`、`ProvisionedDevices = [00006021-000A31483687401E]`（打包机 UUID）。
+4. **签名状态**：`codesign` 显示 `flags=0x0(none)`、无公证票据；`Authority=Apple Development`、`TeamIdentifier=HP5WBFL9G3`。
+5. **配套改动**：启动错误页新增“完全磁盘访问权限”指引文案（en/zh-Hans 均已编译进入产物）；`Documentation/build-and-run.md` 新增“分发到另一台 Mac”一节。
+
+## 10. 测试目录丢失与恢复（同日）
+
+`SharedKit/Tests` 整个目录在 14:54 左右被外部操作删除（不在废纸篓，Spotlight 亦无结果），导致 SwiftPM 解析失败、无法构建。处理：
+
+1. 按当前 API 重建全部测试（10 个套件 + mock 支持文件），`swift test` → **72 项通过**。
+2. 建立首个 git 提交点 `dfac81c`（含源码、测试、文档与 dist 交付包；忽略 `.build/`、`.swiftpm/`、`xcuserdata/`、`.DS_Store`），避免再次无历史可恢复。
+3. 重新构建并交付：`dist/AppDrop-1.0.0-macOS-universal.zip`，SHA-256 `1797fc8d76cd7c0d06789e41ff9f0952de3baf837d66dc0934736ff1a3946e2c`。
+
