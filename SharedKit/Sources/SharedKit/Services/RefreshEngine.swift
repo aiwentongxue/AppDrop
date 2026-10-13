@@ -149,6 +149,9 @@ public final class RefreshEngine: @unchecked Sendable {
                 }
             }
 
+            // Repair derived low-price flags written by older builds before
+            // comparing any prices (a lone baseline used to count as a low).
+            _ = try? await store.reconcilePriceState()
             let snapshots = try await store.allSnapshots()
             return await performCycle(snapshots: snapshots, source: source, startedAt: startedAt)
         } catch {
@@ -193,6 +196,7 @@ public final class RefreshEngine: @unchecked Sendable {
         defer { handle?.release() }
 
         do {
+            _ = try? await store.reconcilePriceState()
             guard let snapshot = try await store.snapshot(appID: appID) else {
                 return RefreshSummary(
                     source: source,

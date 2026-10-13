@@ -126,9 +126,12 @@ struct AppDetailView: View {
             )
             statCard(
                 titleKey: "detail.lowestPrice",
-                value: app.lowestPrice.map { PriceFormatting.priceString($0, currency: app.currency ?? "") }
-                    ?? AppStrings.string("card.pendingPrice"),
-                detail: nil
+                value: hasPriceComparison
+                    ? app.lowestPrice.map { PriceFormatting.priceString($0, currency: app.currency ?? "") } ?? "—"
+                    : "—",
+                detail: hasPriceComparison
+                    ? nil
+                    : app.formattedPrice.map { AppStrings.format("detail.lowestNoComparisonFormat", $0) }
             )
             statCard(
                 titleKey: "detail.lastChange",
@@ -172,9 +175,15 @@ struct AppDetailView: View {
                 .font(.headline)
             PriceHistoryChartView(
                 points: chartPoints,
-                lowest: lowestPoint
+                lowest: hasPriceComparison ? lowestPoint : nil
             )
         }
+    }
+
+    /// True once at least one higher price has been observed, i.e. the recorded
+    /// minimum can be meaningfully called a low.
+    private var hasPriceComparison: Bool {
+        app.priceObservationCount >= 2
     }
 
     private var actionSection: some View {

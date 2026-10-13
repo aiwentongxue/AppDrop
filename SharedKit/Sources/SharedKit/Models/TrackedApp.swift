@@ -23,6 +23,11 @@ public final class TrackedApp {
     /// Drop versus the previous effective price, in percent.
     public var discountRate: Decimal
     public var isAtHistoricalLow: Bool
+    /// Number of recorded price observations in the current currency (the
+    /// baseline plus every observed change). A lone observation cannot prove
+    /// an all-time low, so the low badge requires at least two.
+    /// The default keeps the additive SwiftData migration lightweight.
+    public var priceObservationCount: Int = 0
     public var lastCheckedAt: Date?
     public var lastCheckAttemptAt: Date?
     public var lastCheckStatusRaw: String
@@ -48,6 +53,7 @@ public final class TrackedApp {
         isDiscounted: Bool = false,
         discountRate: Decimal = 0,
         isAtHistoricalLow: Bool = false,
+        priceObservationCount: Int = 0,
         lastCheckedAt: Date? = nil,
         lastCheckAttemptAt: Date? = nil,
         lastCheckStatus: CheckStatus = .unknown,
@@ -72,6 +78,7 @@ public final class TrackedApp {
         self.isDiscounted = isDiscounted
         self.discountRate = discountRate
         self.isAtHistoricalLow = isAtHistoricalLow
+        self.priceObservationCount = priceObservationCount
         self.lastCheckedAt = lastCheckedAt
         self.lastCheckAttemptAt = lastCheckAttemptAt
         self.lastCheckStatusRaw = lastCheckStatus.rawValue
@@ -110,6 +117,7 @@ public final class TrackedApp {
                 discountRate: discountRate,
                 isAtHistoricalLow: isAtHistoricalLow
             ),
+            priceObservationCount: priceObservationCount,
             lastCheckedAt: lastCheckedAt,
             lastCheckAttemptAt: lastCheckAttemptAt,
             lastCheckStatus: lastCheckStatus,

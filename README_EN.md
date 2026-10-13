@@ -132,6 +132,7 @@ Your tracking list can be exported as a `.wishdrop` file (JSON) to share across 
 | Background schedule accuracy | `StartInterval` is not a strict guarantee; the Helper may be delayed if the Mac is asleep or shut down |
 | Currency conversion | No exchange-rate conversion; prices across different storefronts are not compared or merged |
 | Discount definition | "Price drop" means the new price is lower than the previous recorded price — not an official App Store promotional discount |
+| All-time low detection | Based on locally recorded observations: a price counts as a low only when it equals the recorded minimum and a higher price was observed before. A first-time baseline never counts; App Store's official price history is not available |
 | Data migration | Tracking data lives in the local App Group container; use export/import Wishdrop to migrate between machines |
 
 ## Contributing

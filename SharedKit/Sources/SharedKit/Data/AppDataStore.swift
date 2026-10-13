@@ -108,7 +108,10 @@ public actor AppDataStore {
             formattedPrice: draft.formattedPrice,
             currency: draft.currency,
             lowestPrice: draft.price,
-            isAtHistoricalLow: draft.price != nil,
+            // The first observation is a baseline only; it cannot be an
+            // all-time low until a higher price has been observed at least once.
+            isAtHistoricalLow: false,
+            priceObservationCount: draft.price != nil ? 1 : 0,
             lastCheckedAt: draft.price != nil ? now : nil,
             lastCheckAttemptAt: draft.price != nil ? now : nil,
             lastCheckStatus: draft.price != nil ? .ok : .unknown,
@@ -208,6 +211,11 @@ public actor AppDataStore {
             appended = makeRecord(for: app, state: state, type: .currencyChange, timestamp: now)
         }
 
+        // Every appended record is one more observed price; a lone baseline
+        // must never qualify as an all-time low (see PriceEngine docs).
+        if appended != nil {
+            app.priceObservationCount += 1
+        }
         try modelContext.save()
         return AppliedEvaluation(
             app: app.makeSnapshot(),
@@ -315,16 +323,80 @@ public actor AppDataStore {
         app.currentPrice = price
         app.formattedPrice = formattedPrice
         app.currency = currency
-        app.lowestPrice = price
         app.isDiscounted = false
         app.discountRate = 0
-        app.isAtHistoricalLow = price != nil
+        let country = StoreCountry.normalized(countryCode)
+        let descriptor = FetchDescriptor<PriceRecord>(
+            predicate: #Predicate { $0.trackId == trackId && $0.countryCode == country }
+        )
+        if try modelContext.fetch(descriptor).isEmpty,
+           let price, let formattedPrice, let currency {
+            // Mirror a real first observation so history and derived state stay
+            // consistent.
+            let record = PriceRecord(
+                trackId: trackId,
+                countryCode: country,
+                timestamp: now,
+                price: price,
+                formattedPrice: formattedPrice,
+                currency: currency,
+                recordType: .initial
+            )
+            record.app = app
+            modelContext.insert(record)
+            try modelContext.save()
+        }
+        let stored = try modelContext.fetch(descriptor)
+        let prices = stored
+            .filter { currency == nil || $0.currency == currency }
+            .map(\.price)
+        app.priceObservationCount = prices.count
+        app.lowestPrice = prices.min() ?? price
+        app.isAtHistoricalLow = price.map {
+            PriceEngine.isAtHistoricalLow(current: $0, observedPrices: prices)
+        } ?? false
         app.lastCheckedAt = now
         app.lastCheckAttemptAt = now
         app.lastCheckStatus = .ok
         app.lastCheckError = nil
         try modelContext.save()
         return app.makeSnapshot()
+    }
+
+    /// Recomputes the derived low-price state (lowest price, observation count
+    /// and the all-time-low flag) from the stored records. Older builds flagged
+    /// a lone baseline observation as an all-time low; this repair runs at
+    /// launch and before every refresh cycle so stale rows are corrected.
+    /// Returns the number of apps whose stored state changed.
+    @discardableResult
+    public func reconcilePriceState() throws -> Int {
+        let apps = try modelContext.fetch(FetchDescriptor<TrackedApp>())
+        guard !apps.isEmpty else { return 0 }
+        let records = try modelContext.fetch(FetchDescriptor<PriceRecord>())
+        let byKey = Dictionary(grouping: records) {
+            TrackedApp.makeLogicalKey(trackId: $0.trackId, countryCode: $0.countryCode)
+        }
+        var changed = 0
+        for app in apps {
+            let prices = (byKey[app.logicalKey] ?? [])
+                .filter { app.currency == nil || $0.currency == app.currency }
+                .map(\.price)
+            let lowest = prices.min()
+            let atLow = app.currentPrice.map {
+                PriceEngine.isAtHistoricalLow(current: $0, observedPrices: prices)
+            } ?? false
+            guard app.priceObservationCount != prices.count
+                || app.lowestPrice != lowest
+                || app.isAtHistoricalLow != atLow else { continue }
+            app.priceObservationCount = prices.count
+            app.lowestPrice = lowest
+            app.isAtHistoricalLow = atLow
+            changed += 1
+        }
+        if changed > 0 {
+            try modelContext.save()
+        }
+        return changed
     }
 
     // MARK: - Private helpers

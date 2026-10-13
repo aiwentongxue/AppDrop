@@ -3,6 +3,10 @@ import Testing
 @testable import SharedKit
 
 @Suite struct PriceEngineTests {
+    private func decimal(_ string: String) -> Decimal {
+        Decimal(string: string) ?? 0
+    }
+
     private func app(
         price: Decimal?,
         currency: String? = "USD",
@@ -44,7 +48,8 @@ import Testing
         }
         #expect(newState.price == Decimal(string: "4.99"))
         #expect(newState.lowestPrice == Decimal(string: "4.99"))
-        #expect(newState.isAtHistoricalLow)
+        // A lone baseline observation is not an all-time low.
+        #expect(!newState.isAtHistoricalLow)
         #expect(!newState.isDiscounted)
     }
 
@@ -136,6 +141,37 @@ import Testing
         #expect(newState.currency == "JPY")
         #expect(newState.lowestPrice == 700)
         #expect(!newState.isDiscounted)
+        #expect(!newState.isAtHistoricalLow)
+    }
+
+    @Test func historicalLowRequiresEvidenceOfAHigherObservation() {
+        #expect(!PriceEngine.isAtHistoricalLow(current: 4.99, observedPrices: []))
+        #expect(!PriceEngine.isAtHistoricalLow(current: decimal("4.99"), observedPrices: [decimal("4.99")]))
+        #expect(!PriceEngine.isAtHistoricalLow(current: decimal("4.99"), observedPrices: [decimal("4.99"), decimal("4.99")]))
+        #expect(PriceEngine.isAtHistoricalLow(current: decimal("4.99"), observedPrices: [decimal("9.99"), decimal("4.99")]))
+        // Back at the low after a rise: equal to the minimum, with a higher
+        // observation on record.
+        #expect(PriceEngine.isAtHistoricalLow(current: decimal("4.99"), observedPrices: [decimal("9.99"), decimal("4.99"), decimal("9.99"), decimal("4.99")]))
+        #expect(!PriceEngine.isAtHistoricalLow(current: decimal("4.99"), observedPrices: [decimal("9.99"), decimal("2.99"), decimal("9.99"), decimal("4.99")]))
+        #expect(!PriceEngine.isAtHistoricalLow(current: decimal("9.99"), observedPrices: [decimal("9.99"), decimal("2.99")]))
+        #expect(!PriceEngine.isAtHistoricalLow(current: 0, observedPrices: [0]))
+    }
+
+    @Test func firstObservedDropQualifiesAsLowWithRealEvidence() {
+        let baseline = PriceEngine.evaluate(previous: nil, result: app(price: Decimal(string: "9.99")))
+        guard case .baseline(let baselineState) = baseline else {
+            Issue.record("expected baseline, got \(baseline)")
+            return
+        }
+        #expect(!baselineState.isAtHistoricalLow)
+
+        let drop = PriceEngine.evaluate(previous: baselineState, result: app(price: Decimal(string: "4.99")))
+        guard case .decreased(let droppedState, _, let isNewLow) = drop else {
+            Issue.record("expected decrease, got \(drop)")
+            return
+        }
+        #expect(isNewLow)
+        #expect(droppedState.isAtHistoricalLow)
     }
 
     @Test func freePricesNeverDivideByZero() {

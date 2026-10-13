@@ -41,6 +41,8 @@ public struct TrackedAppSnapshot: Sendable, Equatable, Identifiable {
     public var artworkURL: String?
     public var appStoreURL: String?
     public var price: PriceSnapshot
+    /// Number of recorded price observations in the current currency.
+    public var priceObservationCount: Int
     public var lastCheckedAt: Date?
     public var lastCheckAttemptAt: Date?
     public var lastCheckStatus: CheckStatus
@@ -58,6 +60,7 @@ public struct TrackedAppSnapshot: Sendable, Equatable, Identifiable {
         artworkURL: String? = nil,
         appStoreURL: String? = nil,
         price: PriceSnapshot = PriceSnapshot(),
+        priceObservationCount: Int = 0,
         lastCheckedAt: Date? = nil,
         lastCheckAttemptAt: Date? = nil,
         lastCheckStatus: CheckStatus = .unknown,
@@ -74,6 +77,7 @@ public struct TrackedAppSnapshot: Sendable, Equatable, Identifiable {
         self.artworkURL = artworkURL
         self.appStoreURL = appStoreURL
         self.price = price
+        self.priceObservationCount = priceObservationCount
         self.lastCheckedAt = lastCheckedAt
         self.lastCheckAttemptAt = lastCheckAttemptAt
         self.lastCheckStatus = lastCheckStatus

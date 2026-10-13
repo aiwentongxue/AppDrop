@@ -153,6 +153,57 @@
         }
       }
     },
+    "add.platform" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platform"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平台"
+          }
+        }
+      }
+    },
+    "add.platform.ios" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone·iPad"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone·iPad"
+          }
+        }
+      }
+    },
+    "add.platform.mac" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac"
+          }
+        }
+      }
+    },
     "add.region" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -183,108 +234,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜索"
-          }
-        }
-      }
-    },
-    "add.platform" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platform"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平台"
-          }
-        }
-      }
-    },
-    "add.platform.mac" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac"
-          }
-        }
-      }
-    },
-    "add.platform.ios" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone·iPad"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone·iPad"
-          }
-        }
-      }
-    },
-    "platform.mac" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac"
-          }
-        }
-      }
-    },
-    "platform.ios" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone·iPad"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone·iPad"
-          }
-        }
-      }
-    },
-    "add.search.noResults" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No results."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "没有搜索结果。"
           }
         }
       }
@@ -323,19 +272,19 @@
         }
       }
     },
-    "add.search.switchToLink" : {
+    "add.search.noResults" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add by link instead"
+            "value" : "No results."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "改用链接添加"
+            "value" : "没有搜索结果。"
           }
         }
       }
@@ -353,6 +302,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜索 App Store"
+          }
+        }
+      }
+    },
+    "add.search.switchToLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add by link instead"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改用链接添加"
           }
         }
       }
@@ -450,6 +416,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "较上次价格下降 %@"
+          }
+        }
+      }
+    },
+    "card.firstRecordFormat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First seen %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首次记录 %@"
           }
         }
       }
@@ -674,6 +657,10 @@
           }
         }
       }
+    },
+    "Copyright (C) 2026 我是艾文喵" : {
+      "comment" : "The copyright notice for the app.",
+      "isCommentAutoGenerated" : true
     },
     "detail.changeRegion" : {
       "extractionState" : "manual",
@@ -943,6 +930,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近成功检查"
+          }
+        }
+      }
+    },
+    "detail.lowestNoComparisonFormat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First recorded %@, no comparison yet"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首次记录 %@，暂无对比"
           }
         }
       }
@@ -1606,6 +1610,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未知"
+          }
+        }
+      }
+    },
+    "platform.ios" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone·iPad"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone·iPad"
+          }
+        }
+      }
+    },
+    "platform.mac" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac"
           }
         }
       }

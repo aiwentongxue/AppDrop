@@ -132,7 +132,10 @@ struct TrackedAppCardView: View {
             VStack(alignment: .leading, spacing: 3) {
                 DiscountLine(app: app)
                 if let lowest = app.lowestPrice {
-                    Text(AppStrings.format("card.lowestFormat", PriceFormatting.priceString(lowest, currency: app.currency ?? "")))
+                    // A single observation is a baseline, not a verified low;
+                    // keep the wording honest until a comparison exists.
+                    let key = app.priceObservationCount >= 2 ? "card.lowestFormat" : "card.firstRecordFormat"
+                    Text(AppStrings.format(key, PriceFormatting.priceString(lowest, currency: app.currency ?? "")))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -103,6 +103,9 @@ import Testing
         let records = try await harness.store.records(trackId: "123456789", countryCode: "us")
         #expect(records.count == 2)
         #expect(records.last?.notifiedAt != nil)
+        let snapshot = try #require(try await harness.store.snapshot(trackId: "123456789", countryCode: "us"))
+        #expect(snapshot.price.isAtHistoricalLow)
+        #expect(snapshot.priceObservationCount == 2)
     }
 
     @Test func firstSuccessfulCheckCreatesBaselineWithoutNotification() async throws {
@@ -115,7 +118,9 @@ import Testing
         #expect(harness.notifier.sent.isEmpty)
         let snapshot = try #require(try await harness.store.snapshot(trackId: "123456789", countryCode: "us"))
         #expect(snapshot.price.price == Decimal(string: "4.99"))
-        #expect(snapshot.price.isAtHistoricalLow)
+        // A baseline alone is not a low; nothing has dropped yet.
+        #expect(!snapshot.price.isAtHistoricalLow)
+        #expect(snapshot.priceObservationCount == 1)
     }
 
     @Test func notFoundKeepsPriceAndMarksEntry() async throws {

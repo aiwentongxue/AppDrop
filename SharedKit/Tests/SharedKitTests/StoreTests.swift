@@ -33,6 +33,9 @@ import Testing
         let snapshot = try await store.insert(draft(), now: now)
         #expect(snapshot.price.price == Decimal(string: "4.99"))
         #expect(snapshot.lastCheckStatus == .ok)
+        // First observation is a baseline, not an all-time low.
+        #expect(!snapshot.price.isAtHistoricalLow)
+        #expect(snapshot.priceObservationCount == 1)
         let counts = try await store.counts()
         #expect(counts.trackedApps == 1)
         #expect(counts.priceRecords == 1)
@@ -92,6 +95,8 @@ import Testing
         #expect(applied.isNewLow)
         #expect(applied.appendedRecordType == .decrease)
         #expect(applied.app.price.discountRate == Decimal(string: "50.1"))
+        #expect(applied.app.price.isAtHistoricalLow)
+        #expect(applied.app.priceObservationCount == 2)
         let records = try await store.records(trackId: "123456789", countryCode: "us")
         #expect(records.count == 2)
         #expect(records.last?.recordType == .decrease)
@@ -215,6 +220,60 @@ import Testing
         )
         #expect(updated.price.price == Decimal(string: "9.99"))
         #expect(updated.price.lowestPrice == Decimal(string: "9.99"))
+        #expect(!updated.price.isAtHistoricalLow)
+        #expect(updated.priceObservationCount == 1)
+    }
+
+    @Test func reconcileClearsLegacyBaselineLowFlag() async throws {
+        let (store, container) = try makeStore()
+        _ = try await store.insert(draft(), now: Date())
+
+        // Simulate a row written by an older build: one record, flagged as low.
+        let context = ModelContext(container)
+        let apps = try context.fetch(FetchDescriptor<TrackedApp>())
+        let legacy = try #require(apps.first)
+        legacy.isAtHistoricalLow = true
+        legacy.priceObservationCount = 0
+        try context.save()
+
+        let changed = try await store.reconcilePriceState()
+        #expect(changed == 1)
+        let snapshot = try #require(try await store.snapshot(trackId: "123456789", countryCode: "us"))
+        #expect(!snapshot.price.isAtHistoricalLow)
+        #expect(snapshot.priceObservationCount == 1)
+        #expect(snapshot.price.lowestPrice == Decimal(string: "4.99"))
+    }
+
+    @Test func reconcileKeepsGenuineLowAndRecomputesCount() async throws {
+        let (store, container) = try makeStore()
+        let inserted = try await store.insert(draft(price: Decimal(string: "9.99")), now: Date())
+        let evaluation = PriceEngine.evaluate(
+            previous: inserted.price,
+            result: AppStoreApp(trackId: "123456789", name: "Example", price: Decimal(string: "4.99"), formattedPrice: "$4.99", currency: "USD")
+        )
+        _ = try await store.apply(evaluation, appID: inserted.id, metadata: nil, now: Date())
+
+        // Simulate a stale row: the flag and the count were never maintained.
+        let context = ModelContext(container)
+        let apps = try context.fetch(FetchDescriptor<TrackedApp>())
+        let stale = try #require(apps.first)
+        stale.isAtHistoricalLow = false
+        stale.priceObservationCount = 0
+        try context.save()
+
+        let changed = try await store.reconcilePriceState()
+        #expect(changed == 1)
+        let snapshot = try #require(try await store.snapshot(trackId: "123456789", countryCode: "us"))
+        #expect(snapshot.price.isAtHistoricalLow)
+        #expect(snapshot.priceObservationCount == 2)
+        #expect(snapshot.price.lowestPrice == Decimal(string: "4.99"))
+    }
+
+    @Test func reconcileIsANoOpForConsistentRows() async throws {
+        let (store, _) = try makeStore()
+        _ = try await store.insert(draft(), now: Date())
+        let changed = try await store.reconcilePriceState()
+        #expect(changed == 0)
     }
 }
 

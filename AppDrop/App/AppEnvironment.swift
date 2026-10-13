@@ -98,10 +98,30 @@ final class AppEnvironment: ObservableObject {
         ) { [weak self] _ in
             Task { @MainActor in self?.bumpDataVersion() }
         }
+
+        Task { [weak self] in
+            await self?.reconcileStoredState()
+        }
     }
 
     func bumpDataVersion() {
         dataVersion += 1
+    }
+
+    /// Repairs derived low-price flags written by older builds (a lone baseline
+    /// observation used to be flagged as an all-time low). Skips while the
+    /// background helper holds the refresh lock — that run reconciles itself.
+    private func reconcileStoredState() async {
+        guard let store else { return }
+        var handle: FileLock.Handle?
+        if let lockURL = RefreshEngine.defaultLockURL() {
+            handle = try? FileLock(url: lockURL).acquire(.skipIfBusy)
+            guard handle != nil else { return }
+        }
+        defer { handle?.release() }
+        if let changed = try? await store.reconcilePriceState(), changed > 0 {
+            bumpDataVersion()
+        }
     }
 
     // MARK: - Onboarding
