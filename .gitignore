@@ -58,3 +58,6 @@ venv/
 # AI-generated or local-only assets
 Gemini_Generated_Image_*.jpg
 Gemini_Generated_Image_*.png
+
+# Documentation (local dev notes, not part of the public repo)
+Documentation/

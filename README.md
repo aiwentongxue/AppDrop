@@ -1,5 +1,9 @@
 # AppDrop
 
+<p>
+  <a href="README.md">简体中文</a> | <a href="README_EN.md">English</a>
+</p>
+
 > 面向 macOS 用户的 App Store 价格追踪工具。追踪多商店区域的应用价格，查看历史走势与历史新低，并在降价时通过系统通知提醒你。
 
 ![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue)
@@ -18,9 +22,7 @@
 
 ## 截图
 
-| 主界面 | 价格图表 | 设置 |
-|--------|---------|------|
-| ![主界面](Documentation/screenshots/main-window.png) | ![价格图表](Documentation/screenshots/main-window-normal-launch.png) | ![设置](Documentation/screenshots/settings-backend-status.png) |
+![主界面](screenshots/main-window-grid.png)
 
 ## 技术栈
 
@@ -43,9 +45,8 @@ project.yml                  # 工程定义（targets / 签名 / 复制阶段 / 
 AppDrop/                     # 主应用（App / Views / ViewModels / Resources / entitlements）
 AppDropHelper/               # 后台助手（LSUIElement，main.swift + launchd plist）
 SharedKit/                   # 共享 SwiftPM 包（Models / Services / Data / Utilities + Tests）
-Documentation/               # 构建、后台服务、Wishdrop 格式与测试报告
 Scripts/                     # 辅助脚本（图标生成、可分享构建打包）
-dist/                        # 构建产物（.zip + SHA-256 校验文件）
+screenshots/                 # README 截图
 ```
 
 ## 快速开始
@@ -78,8 +79,6 @@ xcodebuild -project AppDrop.xcodeproj -scheme AppDrop -configuration Release \
   -derivedDataPath /private/tmp/AppDrop-Release-DD -allowProvisioningUpdates build
 ```
 
-详细说明（含签名、安装、排错）见 [Documentation/build-and-run.md](Documentation/build-and-run.md)。
-
 ### 首次启动授权
 
 本项目使用个人团队证书签名，App Group 容器受 TCC 保护。首次启动时若出现"无法打开共享数据库"，请：
@@ -94,8 +93,6 @@ xcodebuild -project AppDrop.xcodeproj -scheme AppDrop -configuration Release \
 - Helper 默认带 `--scheduled` 参数运行：距上次尝试不足 20 小时则跳过；`--run-now` 可强制执行；完成写库与通知后正常退出，不常驻、不轮询。
 - `StartInterval = 86400` 为"尽力调度"，Mac 休眠/关机期间不保证执行，醒来后由逾期判断补跑。
 
-详见 [Documentation/background-helper.md](Documentation/background-helper.md)。
-
 ## 通知权限
 
 macOS 通知权限按进程独立：
@@ -105,7 +102,7 @@ macOS 通知权限按进程独立：
 
 ## Wishdrop 格式
 
-追踪列表可导出为 `.wishdrop` 文件（JSON），在不同设备或用户间共享。格式规范见 [Documentation/wishdrop-format.md](Documentation/wishdrop-format.md)。
+追踪列表可导出为 `.wishdrop` 文件（JSON），在不同设备或用户间共享。
 
 ## App Group 与共享数据库
 
@@ -130,13 +127,6 @@ macOS 通知权限按进程独立：
 | 汇率换算 | 不做汇率换算，不合并不同区域的最低价；同一应用不同区域为独立追踪项 |
 | 降价定义 | "较上次降价"基于两次有效价格之差，不是商店官方促销折扣 |
 | 数据迁移 | 追踪数据存于本机 App Group 容器，迁移请使用导出/导入心愿单功能 |
-
-## 相关文档
-
-- [构建与运行](Documentation/build-and-run.md)
-- [后台服务启用与排错](Documentation/background-helper.md)
-- [Wishdrop 文件格式](Documentation/wishdrop-format.md)
-- [测试报告](Documentation/test-report.md)
 
 ## 贡献
 

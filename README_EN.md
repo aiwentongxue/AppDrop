@@ -1,5 +1,9 @@
 # AppDrop
 
+<p>
+  <a href="README.md">简体中文</a> | <a href="README_EN.md">English</a>
+</p>
+
 > A native macOS App Store price tracker. Monitor app prices across multiple storefronts, view price history and all-time lows, and get notified when prices drop.
 
 ![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue)
@@ -18,9 +22,7 @@
 
 ## Screenshots
 
-| Main Window | Price Chart | Settings |
-|-------------|-------------|----------|
-| ![Main](Documentation/screenshots/main-window.png) | ![Chart](Documentation/screenshots/main-window-normal-launch.png) | ![Settings](Documentation/screenshots/settings-backend-status.png) |
+![Main Window](screenshots/main-window-grid.png)
 
 ## Tech Stack
 
