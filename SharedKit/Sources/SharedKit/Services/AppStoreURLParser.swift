@@ -31,7 +31,10 @@ public enum AppStoreURLParserError: Error, LocalizedError, Equatable {
         case .missingCountry:
             return "The link does not include a storefront country."
         case .unsupportedCountry(let code):
-            return "The storefront \"\(code.uppercased())\" is not supported. Choose US, HK, JP or CN."
+            let supported = SharedConstants.supportedCountryCodes
+                .map { $0.uppercased() }
+                .joined(separator: ", ")
+            return "The storefront \"\(code.uppercased())\" is not supported. Supported storefronts: \(supported)."
         case .missingTrackId:
             return "The link does not include an app id."
         case .invalidTrackId(let value):

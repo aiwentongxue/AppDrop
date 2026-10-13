@@ -127,3 +127,71 @@ tail -20 ~/Library/Group\ Containers/group.com.appdrop.shared/AppDrop/helper.log
 2. 建立首个 git 提交点 `dfac81c`（含源码、测试、文档与 dist 交付包；忽略 `.build/`、`.swiftpm/`、`xcuserdata/`、`.DS_Store`），避免再次无历史可恢复。
 3. 重新构建并交付：`dist/AppDrop-1.0.0-macOS-universal.zip`，SHA-256 `1797fc8d76cd7c0d06789e41ff9f0952de3baf837d66dc0934736ff1a3946e2c`。
 
+
+## 11. 1.0.2 地区扩展（17 个商店区域）与全区验证（2026-10-13 晚）
+
+需求：新增下列 17 个商店区域的监测适配，覆盖「搜索添加」「已添加 App 的更换区域」「设置默认区域」三处；交付前需完整验证每个地区可访问且能监测到价格。
+
+```
+us 美国 USD $        cn 中国大陆 CNY ¥      hk 中国香港 HKD HK$    tw 中国台湾 TWD NT$
+jp 日本 JPY ¥        gb 英国 GBP £          de 德国 EUR €          ca 加拿大 CAD CA$
+au 澳大利亚 AUD A$   fr 法国 EUR €          kr 韩国 KRW ₩          sg 新加坡 SGD S$
+tr 土耳其 TRY ₺      ng 尼日利亚 NGN ₦      ar 阿根廷 ARS $        br 巴西 BRL R$     in 印度 INR ₹
+```
+
+### 11.1 实现
+
+- `StoreCountry.regions`（SharedKit）成为地区唯一数据源：代码 / 英文名 / 货币 / 符号；`SharedConstants.supportedCountryCodes` 由它派生，因此搜索选择器、更换区域、设置默认区域、工具栏区域筛选、链接解析、Wishdrop 校验全部自动跟随。
+- 地区名本地化新增 `region.<code>.name` 共 17 组（en / zh-Hans），选择器显示「中国香港 (HK)」形式；`OnboardingView` 的地区选择器由 segmented 改为 menu（17 项）。
+- 「更换区域」重做为独立可滚动面板 `ChangeRegionView`：macOS 的 `confirmationDialog` 只渲染 3 个按钮（用户截图实证），装不下其余 16 个地区；同时修复换区后详情页空白的问题（记录被删除并按新区域重建、导航 ID 失效），现在成功后自动返回列表。
+- 版本号 1.0.2（build 3）。
+
+### 11.2 单元测试
+
+`swift test --package-path SharedKit` → **80 项测试通过**（新增 `StoreRegionTests`：地区表与规格逐项比对、规范化/未知代码回退、17 个代码唯一性；扩展 URL 解析 17 地区与 Wishdrop 新地区用例；原先用 `de` 当“不支持地区”的断言改为 `zz`）。
+
+### 11.3 逐地区真实接口验证（AppStoreService，17 个地区）
+
+每个地区执行：付费 App lookup（取非零价格）、常用 App lookup、iOS 目录关键词 search。
+
+| 地区 | 付费价格实测 | 货币 |
+|---|---|---|
+| us | Minecraft $6.99 | USD |
+| cn | Pixelmator Classic iOS ¥68.00 | CNY |
+| hk | Minecraft HK$ 56.00 | HKD |
+| tw | Minecraft $235.00 | TWD |
+| jp | Minecraft ¥1,300 | JPY |
+| gb | Minecraft £6.99 | GBP |
+| de | Minecraft 6,99 € | EUR |
+| ca | Minecraft $9.99 | CAD |
+| au | Minecraft $10.95 | AUD |
+| fr | Minecraft 6,99 € | EUR |
+| kr | Minecraft ￦9,900 | KRW |
+| sg | Minecraft S$ 9.98 | SGD |
+| tr | Minecraft ₺109,00 | TRY |
+| ng | Minecraft ₦ 500.00 | NGN |
+| ar | Minecraft USD 1.99 | **USD（偏差）** |
+| br | Minecraft R$ 9,90 | BRL |
+| in | Minecraft ₹ 40 | INR |
+
+结果：**lookup 失败 0、search 失败 0、付费价格缺失 0**。
+已知偏差 1 处：**阿根廷（ar）App Store 实际以 USD 计价**（免费与付费结果均返回 USD），与规格表中的 ARS 不一致；该字段目前仅作元数据（价格显示仍用 App Store 返回的 formattedPrice），不影响功能。
+
+### 11.4 Computer Use 实测 UI（Debug 1.0.2 构建）
+
+1. 搜索地区选择器：17 项齐全；选「日本 (JP)」后搜索 Minecraft → 返回真实 JP 结果（Minecraft ¥1,300、Minecraft Education 等，均为 JP / iPhone·iPad）。
+2. 更换区域面板：展开后列出其余 16 个地区（每行带货币与符号）；对测试条目执行更换 → 日本，真实抓价 ¥1,300 JPY，界面自动返回列表（不再出现空白页）。
+3. 设置 → 默认区域：17 项齐全；切换到「中国香港 (HK)」生效并写回 UserDefaults（验证后已恢复为「美国 (US)」）。
+4. 工具栏区域筛选：全部区域 + 17 个地区。
+5. 关于页显示「版本 1.0.2（3）」。
+6. 测试条目已用 `appdropctl remove-test-entry` 清理，共享库恢复为用户原有的 8 个应用。
+
+### 11.5 构建与产物
+
+| 项 | 结果 |
+|---|---|
+| Release 构建 | ✅ BUILD SUCCEEDED（1.0.2 / build 3） |
+| 架构 | ✅ Universal：arm64 + x86_64 |
+| 签名 | ✅ `codesign --verify --deep --strict` 通过（App 与 Helper），无内嵌描述文件（可分享构建） |
+| 运行 | ✅ App 与 Helper 均可读取共享库（8 个追踪项） |
+| 产物 | `dist/AppDrop-1.0.2-macOS-universal.zip`（6.26 MB，sha256 `94988d8b…0fd926`）、`dist/AppDrop-1.0.2-macOS-universal.dmg`（6.75 MB，sha256 `8dad40e8…64d9b0`） |

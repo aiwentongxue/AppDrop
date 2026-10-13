@@ -8,7 +8,20 @@ import Testing
             ("https://apps.apple.com/us/app/example/id123456789", "us", "123456789"),
             ("https://apps.apple.com/hk/app/example/id123456789", "hk", "123456789"),
             ("https://apps.apple.com/jp/app/example/id123456789", "jp", "123456789"),
-            ("https://apps.apple.com/cn/app/example/id123456789", "cn", "123456789")
+            ("https://apps.apple.com/cn/app/example/id123456789", "cn", "123456789"),
+            ("https://apps.apple.com/tw/app/example/id123456789", "tw", "123456789"),
+            ("https://apps.apple.com/gb/app/example/id123456789", "gb", "123456789"),
+            ("https://apps.apple.com/de/app/example/id123456789", "de", "123456789"),
+            ("https://apps.apple.com/ca/app/example/id123456789", "ca", "123456789"),
+            ("https://apps.apple.com/au/app/example/id123456789", "au", "123456789"),
+            ("https://apps.apple.com/fr/app/example/id123456789", "fr", "123456789"),
+            ("https://apps.apple.com/kr/app/example/id123456789", "kr", "123456789"),
+            ("https://apps.apple.com/sg/app/example/id123456789", "sg", "123456789"),
+            ("https://apps.apple.com/tr/app/example/id123456789", "tr", "123456789"),
+            ("https://apps.apple.com/ng/app/example/id123456789", "ng", "123456789"),
+            ("https://apps.apple.com/ar/app/example/id123456789", "ar", "123456789"),
+            ("https://apps.apple.com/br/app/example/id123456789", "br", "123456789"),
+            ("https://apps.apple.com/in/app/example/id123456789", "in", "123456789")
         ]
         for (input, country, trackId) in cases {
             let parsed = try #require(try? AppStoreURLParser.parse(input).get())
@@ -54,7 +67,7 @@ import Testing
     }
 
     @Test func rejectsUnsupportedAndMissingCountry() {
-        #expect(AppStoreURLParser.parse("https://apps.apple.com/de/app/example/id123456789").failure == .unsupportedCountry("de"))
+        #expect(AppStoreURLParser.parse("https://apps.apple.com/zz/app/example/id123456789").failure == .unsupportedCountry("zz"))
         #expect(AppStoreURLParser.parse("https://apps.apple.com/app/id123456789").failure == .missingCountry)
     }
 

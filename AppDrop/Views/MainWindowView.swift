@@ -254,7 +254,7 @@ struct MainWindowView: View {
             Picker(AppStrings.string("toolbar.region"), selection: $regionFilter) {
                 Text(AppStrings.string("filter.allRegions")).tag("")
                 ForEach(SharedConstants.supportedCountryCodes, id: \.self) { code in
-                    Text(StoreCountry.displayCode(for: code)).tag(code)
+                    Text(AppStrings.regionLabel(code)).tag(code)
                 }
             }
             .pickerStyle(.menu)

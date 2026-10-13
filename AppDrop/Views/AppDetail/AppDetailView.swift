@@ -59,19 +59,10 @@ struct AppDetailView: View {
         } message: {
             Text(AppStrings.string("detail.deleteConfirmMessage"))
         }
-        .confirmationDialog(
-            AppStrings.string("detail.changeRegionTitle"),
-            isPresented: $confirmingRegionChange,
-            titleVisibility: .visible
-        ) {
-            ForEach(SharedConstants.supportedCountryCodes.filter { $0 != app.countryCode }, id: \.self) { code in
-                Button(StoreCountry.displayCode(for: code)) {
-                    changeRegion(to: code)
-                }
+        .sheet(isPresented: $confirmingRegionChange) {
+            ChangeRegionView(currentCountryCode: app.countryCode) { code in
+                changeRegion(to: code)
             }
-            Button(AppStrings.string("common.cancel"), role: .cancel) {}
-        } message: {
-            Text(AppStrings.string("detail.changeRegionMessage"))
         }
     }
 
@@ -249,8 +240,14 @@ struct AppDetailView: View {
         Task {
             if let error = await environment.changeRegion(appID: app.id, to: code) {
                 alertMessage = error
+                environment.bumpDataVersion()
+            } else {
+                // The storefront swap deletes this record and creates a fresh
+                // one with a new id, so this detail view no longer resolves.
+                // Pop back to the list, which now shows the new entry.
+                environment.bumpDataVersion()
+                dismiss()
             }
-            environment.bumpDataVersion()
         }
     }
 

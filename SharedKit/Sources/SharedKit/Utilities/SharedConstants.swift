@@ -46,8 +46,10 @@ public enum SharedConstants {
     /// File extension for `.wishdrop` documents.
     public static let wishdropFileExtension = "wishdrop"
 
-    /// Supported App Store storefront country codes (lowercase, ISO 3166-1 alpha-2).
-    public static let supportedCountryCodes: [String] = ["us", "hk", "jp", "cn"]
+    /// Supported App Store storefront country codes (lowercase, ISO 3166-1
+    /// alpha-2) in display order. Derived from `StoreCountry.regions` so every
+    /// picker, validator and formatter stays in sync.
+    public static var supportedCountryCodes: [String] { StoreCountry.codes }
     /// Default storefront for new tracked apps.
     public static let defaultCountryCode = "us"
 

@@ -30,6 +30,7 @@
 		8EDCEEB46F6158898C756D43 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8759553DD4E0F80BA18D443 /* MainWindowView.swift */; };
 		933DEED71609FB3FA58556DB /* AppDropApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2594A6DD04147412301917E /* AppDropApp.swift */; };
 		987FA14A7F025AD0D65B024E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C760F4F598D3F0640848FA26 /* RootView.swift */; };
+		C07286439A88A513B7B9324B /* ChangeRegionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14613A74326DAEF141E570C /* ChangeRegionView.swift */; };
 		C2522C599B8E87AD874F0488 /* TrackedAppViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106E369F1FF864EF0692018 /* TrackedAppViews.swift */; };
 		E9222F2E1A588EE78FD394A3 /* WishdropDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B268BDF75DA909A09BFAEA48 /* WishdropDocument.swift */; };
 		EB8F0ECDE0B3A09AD9142235 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760AC870E63F95FA30461790 /* AppDelegate.swift */; };
@@ -101,6 +102,7 @@
 		D73E8505744EC2BEF3706612 /* RelativeTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeTime.swift; sourceTree = "<group>"; };
 		DA11CF5B6BC7FE4773A9A5A1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DB00824DD0AE5FFC51904AD2 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
+		F14613A74326DAEF141E570C /* ChangeRegionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeRegionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				BF7C9A3FCF8A9EF019B80710 /* AppDetailView.swift */,
+				F14613A74326DAEF141E570C /* ChangeRegionView.swift */,
 				3E8D5526E734E3ADF442A72B /* PriceHistoryChartView.swift */,
 			);
 			path = AppDetail;
@@ -409,6 +412,7 @@
 				8C56D16D8E4CAB2AFB5FA366 /* AppEventBus.swift in Sources */,
 				6664480E849D3139ADCC554A /* AppStrings.swift in Sources */,
 				480640901BF943C6CE636A50 /* BackendManager.swift in Sources */,
+				C07286439A88A513B7B9324B /* ChangeRegionView.swift in Sources */,
 				461880A3360E1C301ABDC758 /* ImportSummaryView.swift in Sources */,
 				8EDCEEB46F6158898C756D43 /* MainWindowView.swift in Sources */,
 				7D0CCC48FE788A9C5B16C1C3 /* OnboardingView.swift in Sources */,
@@ -573,14 +577,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AppDropHelper/AppDropHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = AppDropHelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appdrop.helper;
 				PRODUCT_NAME = AppDropHelper;
 				SDKROOT = macosx;
@@ -594,14 +598,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AppDropHelper/AppDropHelper.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = AppDropHelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appdrop.helper;
 				PRODUCT_NAME = AppDropHelper;
 				SDKROOT = macosx;
@@ -615,14 +619,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AppDrop/AppDrop.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = AppDrop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appdrop.app;
 				PRODUCT_NAME = AppDrop;
 				SDKROOT = macosx;
@@ -635,14 +639,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AppDrop/AppDrop.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = AppDrop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.appdrop.app;
 				PRODUCT_NAME = AppDrop;
 				SDKROOT = macosx;

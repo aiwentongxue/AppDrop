@@ -66,7 +66,7 @@ import Testing
         let preset = makePreset(apps: [
             WishdropApp(trackId: "123456789", name: "Good", countryCode: "us"),
             WishdropApp(trackId: "12", name: "Bad Id", countryCode: "us"),
-            WishdropApp(trackId: "123456789", name: "Bad Country", countryCode: "de"),
+            WishdropApp(trackId: "123456789", name: "Bad Country", countryCode: "zz"),
             WishdropApp(trackId: "223456789", name: "   ", countryCode: "us"),
             WishdropApp(trackId: "323456789", name: "Bad URL", countryCode: "us", appStoreURL: "not a url")
         ])

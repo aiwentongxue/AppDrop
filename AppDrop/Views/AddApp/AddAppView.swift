@@ -79,7 +79,7 @@ struct AddAppView: View {
             HStack(spacing: 10) {
                 Button(AppStrings.string("add.link.parse")) { parseLink() }
                 if let parsedLink {
-                    Text("\(parsedLink.countryCode.uppercased()) · id\(parsedLink.trackId)")
+                    Text("\(AppStrings.regionLabel(parsedLink.countryCode)) · id\(parsedLink.trackId)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -134,11 +134,11 @@ struct AddAppView: View {
             HStack(spacing: 10) {
                 Picker(AppStrings.string("add.region"), selection: $searchCountry) {
                     ForEach(SharedConstants.supportedCountryCodes, id: \.self) { code in
-                        Text(StoreCountry.displayCode(for: code)).tag(code)
+                        Text(AppStrings.regionLabel(code)).tag(code)
                     }
                 }
                 .pickerStyle(.menu)
-                .frame(width: 130)
+                .frame(width: 210)
                 Picker(AppStrings.string("add.platform"), selection: $searchPlatform) {
                     Text(AppStrings.string("add.platform.mac")).tag(AppStoreSearchPlatform.macOS)
                     Text(AppStrings.string("add.platform.ios")).tag(AppStoreSearchPlatform.iOS)

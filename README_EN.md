@@ -12,13 +12,29 @@
 
 ## Features
 
-- 🔍 **Multi-storefront tracking** — Track prices across US, HK, JP, and CN; each tracked item is tied to a specific storefront.
+- 🔍 **Multi-storefront tracking** — Track prices across 17 storefronts; each tracked item is tied to a specific storefront.
 - 📈 **Price history chart** — Step-line chart powered by Swift Charts (`.stepEnd` interpolation).
 - 🏷️ **All-time low detection** — Automatically identifies and badges all-time low prices.
 - 🔔 **Local notifications** — Sends a system notification when a price drops (main App and background Helper each request their own permission).
 - 🔄 **Background checks** — Scheduled via SMAppService + launchd; the Helper runs, writes to the database, sends notifications, then exits — no persistent process.
 - 📋 **Wishdrop format** — Import and export your tracking list as a `.wishdrop` file (JSON).
 - 🔗 **Two ways to add apps** — Paste an App Store link or search by keyword (Mac and iPhone·iPad catalogs supported).
+
+## Supported Storefronts
+
+The same region list (17 storefronts) drives the search picker, the "change region" menu and the default-region setting:
+
+| Code | Region | Currency | Code | Region | Currency |
+|------|--------|----------|------|--------|----------|
+| US | United States | USD | GB | United Kingdom | GBP |
+| CN | China mainland | CNY | DE | Germany | EUR |
+| HK | Hong Kong | HKD | CA | Canada | CAD |
+| TW | Taiwan | TWD | AU | Australia | AUD |
+| JP | Japan | JPY | FR | France | EUR |
+| KR | South Korea | KRW | SG | Singapore | SGD |
+| TR | Türkiye | TRY | NG | Nigeria | NGN |
+| AR | Argentina | ARS | BR | Brazil | BRL |
+| IN | India | INR | | | |
 
 ## Screenshots
 

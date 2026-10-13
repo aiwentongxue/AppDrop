@@ -97,10 +97,10 @@ struct OnboardingView: View {
             set: { environment.setDefaultCountryCode($0) }
         )) {
             ForEach(SharedConstants.supportedCountryCodes, id: \.self) { code in
-                Text(StoreCountry.displayCode(for: code)).tag(code)
+                Text(AppStrings.regionLabel(code)).tag(code)
             }
         }
-        .pickerStyle(.segmented)
+        .pickerStyle(.menu)
         .frame(maxWidth: 380)
     }
 
