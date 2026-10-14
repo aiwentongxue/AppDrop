@@ -82,7 +82,6 @@ struct MainWindowView: View {
         } detail: {
             NavigationStack {
                 content
-                    .id(environment.dataVersion)
                     .navigationDestination(for: UUID.self) { appID in
                         if let app = trackedApps.first(where: { $0.id == appID }) {
                             AppDetailView(app: app)

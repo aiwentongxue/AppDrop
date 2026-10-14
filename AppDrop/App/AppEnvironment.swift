@@ -50,6 +50,7 @@ final class AppEnvironment: ObservableObject {
     @Published var onboardingCompleted: Bool
     @Published var defaultCountryCode: String
     @Published private(set) var showOnboarding: Bool
+    private var lastObservedCheckAttempt: Date?
 
     init() {
         let defaults = UserDefaults.standard
@@ -96,16 +97,35 @@ final class AppEnvironment: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.bumpDataVersion() }
+            Task { @MainActor in await self?.handleDidBecomeActive() }
         }
 
         Task { [weak self] in
-            await self?.reconcileStoredState()
+            guard let self else { return }
+            if let store = self.store {
+                self.lastObservedCheckAttempt = try? await store.latestAttemptDate()
+            }
+            await self.reconcileStoredState()
         }
     }
 
     func bumpDataVersion() {
         dataVersion += 1
+        if let store {
+            Task { @MainActor [weak self] in
+                self?.lastObservedCheckAttempt = try? await store.latestAttemptDate()
+            }
+        }
+    }
+
+    private func handleDidBecomeActive() async {
+        backend.refreshStatus()
+        guard let store else { return }
+        if let latest = try? await store.latestAttemptDate(), latest != lastObservedCheckAttempt {
+            lastObservedCheckAttempt = latest
+            dataVersion += 1
+            await reconcileStoredState()
+        }
     }
 
     /// Repairs derived low-price flags written by older builds (a lone baseline
