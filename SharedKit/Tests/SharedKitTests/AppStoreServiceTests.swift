@@ -111,6 +111,15 @@ import Testing
         #expect(MockURLProtocol.recordedRequests.count == 3)
     }
 
+    @Test func networkOfflineIsRetriedThenReported() async {
+        MockURLProtocol.reset { _ in
+            MockURLProtocol.Response(error: URLError(.notConnectedToInternet))
+        }
+        let outcome = await makeService().lookup(appIds: ["123456789"], country: "us")
+        #expect(outcome.failedIds == ["123456789"])
+        #expect(MockURLProtocol.recordedRequests.count == 3)
+    }
+
     @Test func decodingFailureIsReported() async {
         MockURLProtocol.reset { _ in
             MockURLProtocol.Response(body: Data("this is not json".utf8))

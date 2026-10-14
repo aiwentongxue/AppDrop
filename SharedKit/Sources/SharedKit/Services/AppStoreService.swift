@@ -432,7 +432,7 @@ public final class AppStoreService: AppStoreFetching, @unchecked Sendable {
     private static func isTransient(error: Error) -> Bool {
         guard let urlError = error as? URLError else { return false }
         switch urlError.code {
-        case .timedOut, .networkConnectionLost, .cannotConnectToHost, .dnsLookupFailed:
+        case .timedOut, .networkConnectionLost, .cannotConnectToHost, .dnsLookupFailed, .notConnectedToInternet:
             return true
         default:
             return false

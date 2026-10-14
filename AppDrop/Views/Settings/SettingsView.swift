@@ -175,8 +175,9 @@ struct SettingsView: View {
     }
 
     private var lastErrorText: String? {
-        if let failure = runs.first(where: { $0.outcome == .failed || $0.outcome == .partial }),
-           let summary = failure.errorSummary, !summary.isEmpty {
+        guard let latest = runs.first else { return nil }
+        if (latest.outcome == .failed || latest.outcome == .partial),
+           let summary = latest.errorSummary, !summary.isEmpty {
             return summary
         }
         return nil
