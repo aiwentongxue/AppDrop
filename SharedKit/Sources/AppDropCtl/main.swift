@@ -62,6 +62,7 @@ func printUsage() {
       lookup --track-id <id> --country <cc>
       export-wishdrop --output <path> [--title <title>]
       import-wishdrop --input <path>
+      validate-wishdrop --input <path>
     """
     print(usage)
 }
@@ -268,6 +269,17 @@ func run() async throws {
         let store = AppDataStore(modelContainer: container)
         let outcome = try await store.importWishdrop(entries: validation.valid, now: Date())
         print("added: \(outcome.addedKeys.count), alreadyTracked: \(outcome.alreadyTrackedKeys.count), invalid: \(validation.issues.count)")
+        for issue in validation.issues {
+            print("  entry[\(issue.index)] \(issue.code.rawValue): \(issue.reason)")
+        }
+
+    case "validate-wishdrop":
+        let input = try requireOption(options, "input")
+        let data = try Data(contentsOf: URL(fileURLWithPath: input))
+        let preset = try WishdropCodec.decode(data)
+        let validation = WishdropCodec.validateEntries(preset)
+        print("title: \"\(preset.title)\", version: \(preset.version), author: \"\(preset.author ?? "")\", total: \(preset.apps.count)")
+        print("valid: \(validation.valid.count), invalid: \(validation.issues.count)")
         for issue in validation.issues {
             print("  entry[\(issue.index)] \(issue.code.rawValue): \(issue.reason)")
         }

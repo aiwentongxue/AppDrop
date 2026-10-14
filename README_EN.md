@@ -17,7 +17,7 @@
 - 🏷️ **All-time low detection** — Automatically identifies and badges all-time low prices.
 - 🔔 **Local notifications** — Sends a system notification when a price drops (main App and background Helper each request their own permission).
 - 🔄 **Background checks** — Scheduled via SMAppService + launchd; the Helper runs, writes to the database, sends notifications, then exits — no persistent process.
-- 📋 **Wishdrop format** — Import and export your tracking list as a `.wishdrop` file (JSON).
+- 📋 **Wishdrop format** — Import and export your tracking list as a `.wishdrop` file (JSON). An optional preset [`MacAppStore-Paid-Games.wishdrop`](MacAppStore-Paid-Games.wishdrop) is provided in the repository for users who want to manually import 85 certified Mac upfront-paid games.
 - 🔗 **Two ways to add apps** — Paste an App Store link or search by keyword (Mac and iPhone·iPad catalogs supported).
 
 ## Supported Storefronts

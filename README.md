@@ -17,7 +17,7 @@
 - 🏷️ **历史新低**：自动识别并标记历史最低价
 - 🔔 **本地通知**：降价时发送系统通知（主 App 与后台 Helper 各自独立请求权限）
 - 🔄 **后台自动检查**：通过 SMAppService + launchd 按天调度，执行后退出，不常驻内存
-- 📋 **Wishdrop 心愿单**：通过 `.wishdrop` 文件格式导入和导出追踪列表
+- 📋 **Wishdrop 心愿单**：通过 `.wishdrop` 文件格式导入和导出追踪列表（仓库附带预设文件 [`MacAppStore付费游戏.wishdrop`](MacAppStore付费游戏.wishdrop) 供有需要的用户手动下载导入 85 款 Mac 纯付费买断游戏）
 - 🔗 **两种添加方式**：粘贴 App Store 链接 或 关键词搜索（支持 Mac / iPhone·iPad 两个目录）
 
 ## 支持的区域
