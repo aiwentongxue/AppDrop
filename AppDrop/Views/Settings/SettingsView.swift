@@ -12,6 +12,9 @@ struct SettingsView: View {
     @State private var notificationStatus: NotificationPermissionStatus = .notDetermined
     @State private var backendError: String?
     @State private var busy = false
+    @State private var changingAllRegions = false
+    @State private var confirmingChangeAllRegions = false
+    @State private var changeAllResultMessage: String?
 
     var body: some View {
         Form {
@@ -27,6 +30,21 @@ struct SettingsView: View {
                 Text(AppStrings.string("settings.defaultRegionCaption"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                HStack(spacing: 8) {
+                    Button(AppStrings.string("settings.changeAllToDefaultRegion")) {
+                        confirmingChangeAllRegions = true
+                    }
+                    .disabled(changingAllRegions || busy || environment.refresh?.isRefreshing == true)
+
+                    if changingAllRegions {
+                        ProgressView().controlSize(.small)
+                        Text(AppStrings.string("settings.changingRegions"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.top, 4)
             }
 
             Section(AppStrings.string("settings.notifications")) {
@@ -137,9 +155,54 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .navigationTitle(AppStrings.string("settings.title"))
+        .confirmationDialog(
+            AppStrings.string("settings.changeAllConfirmTitle"),
+            isPresented: $confirmingChangeAllRegions,
+            titleVisibility: .visible
+        ) {
+            Button(AppStrings.string("settings.changeAllConfirmAction")) {
+                performChangeAllRegions()
+            }
+            Button(AppStrings.string("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(AppStrings.format(
+                "settings.changeAllConfirmMessage",
+                AppStrings.regionLabel(environment.defaultCountryCode)
+            ))
+        }
+        .alert(
+            AppStrings.string("settings.changeAllResultTitle"),
+            isPresented: Binding(
+                get: { changeAllResultMessage != nil },
+                set: { if !$0 { changeAllResultMessage = nil } }
+            )
+        ) {
+            Button(AppStrings.string("common.ok")) {
+                changeAllResultMessage = nil
+            }
+        } message: {
+            Text(changeAllResultMessage ?? "")
+        }
         .task {
             notificationStatus = await environment.notificationScheduler.permission()
             environment.backend.refreshStatus()
+        }
+    }
+
+    private func performChangeAllRegions() {
+        changingAllRegions = true
+        let targetCode = environment.defaultCountryCode
+        Task {
+            let result = await environment.changeAllAppsRegion(to: targetCode)
+            changingAllRegions = false
+            let targetLabel = AppStrings.regionLabel(targetCode)
+            changeAllResultMessage = AppStrings.format(
+                "settings.changeAllResultMessage",
+                result.updatedCount,
+                targetLabel,
+                result.unchangedCount,
+                result.unavailableCount + result.duplicateCount
+            )
         }
     }
 

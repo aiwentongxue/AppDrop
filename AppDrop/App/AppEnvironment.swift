@@ -224,6 +224,17 @@ final class AppEnvironment: ObservableObject {
         }
     }
 
+    func delete(appIDs: Set<UUID>) async -> String? {
+        guard let store else { return startupError }
+        do {
+            try await store.delete(appIDs: appIDs)
+            bumpDataVersion()
+            return nil
+        } catch {
+            return error.localizedDescription
+        }
+    }
+
     func changeRegion(appID: UUID, to country: String) async -> String? {
         guard let refresh else { return startupError }
         let result = await refresh.replaceRegion(appID: appID, country: country)
@@ -235,6 +246,21 @@ final class AppEnvironment: ObservableObject {
         case .failed(let message):
             return message
         }
+    }
+
+    func changeAllAppsRegion(to country: String) async -> BulkRegionChangeResult {
+        guard let refresh else {
+            return BulkRegionChangeResult(
+                targetCountry: country,
+                failedCount: 1,
+                failureMessages: [startupError ?? "Store unavailable"]
+            )
+        }
+        let outcome = await refresh.replaceRegionForAll(to: country)
+        if outcome.updatedCount > 0 {
+            bumpDataVersion()
+        }
+        return outcome
     }
 
     // MARK: - Wishdrop

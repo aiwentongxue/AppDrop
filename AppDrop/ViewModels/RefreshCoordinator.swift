@@ -43,5 +43,18 @@ final class RefreshCoordinator: ObservableObject {
         didFinish()
         return result
     }
+
+    func replaceRegionForAll(to country: String) async -> BulkRegionChangeResult {
+        guard let engine else {
+            return BulkRegionChangeResult(
+                targetCountry: country,
+                failedCount: 1,
+                failureMessages: ["Store unavailable"]
+            )
+        }
+        let result = await engine.replaceRegionForAll(to: country)
+        didFinish()
+        return result
+    }
 }
 

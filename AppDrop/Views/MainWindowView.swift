@@ -66,6 +66,11 @@ struct MainWindowView: View {
     @State private var showingExporter = false
     @State private var alertMessage: String?
     @State private var importInProgress = false
+    @State private var isSelectMode = false
+    @State private var selectedAppIDs: Set<UUID> = []
+    @State private var confirmingBatchDelete = false
+    @State private var deletingSingleApp: TrackedApp? = nil
+    @State private var confirmingSingleDelete = false
 
     @Query(sort: [SortDescriptor(\TrackedApp.createdAt)])
     private var trackedApps: [TrackedApp]
@@ -136,6 +141,39 @@ struct MainWindowView: View {
                     .padding(.bottom, 12)
             }
         }
+        .confirmationDialog(
+            AppStrings.string("batchDelete.confirmTitle"),
+            isPresented: $confirmingBatchDelete,
+            titleVisibility: .visible
+        ) {
+            Button(
+                AppStrings.format("batchDelete.confirmAction", selectedAppIDs.count),
+                role: .destructive
+            ) {
+                deleteSelectedApps()
+            }
+            Button(AppStrings.string("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(AppStrings.format("batchDelete.confirmMessage", selectedAppIDs.count))
+        }
+        .confirmationDialog(
+            AppStrings.string("detail.deleteConfirmTitle"),
+            isPresented: $confirmingSingleDelete,
+            titleVisibility: .visible
+        ) {
+            Button(AppStrings.string("detail.delete"), role: .destructive) {
+                if let deletingSingleApp {
+                    deleteApp(deletingSingleApp.id)
+                }
+            }
+            Button(AppStrings.string("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(AppStrings.string("detail.deleteConfirmMessage"))
+        }
+        .onChange(of: selection) { _, _ in
+            isSelectMode = false
+            selectedAppIDs.removeAll()
+        }
     }
 
     @ViewBuilder
@@ -145,23 +183,62 @@ struct MainWindowView: View {
         } else if filteredApps.isEmpty {
             emptyState
         } else {
-            switch layoutMode {
-            case .grid:
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 14)], spacing: 14) {
-                        ForEach(filteredApps) { app in
-                            NavigationLink(value: app.id) {
-                                TrackedAppCardView(app: app)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(16)
+            VStack(spacing: 0) {
+                if isSelectMode {
+                    selectionBanner
                 }
-            case .list:
-                List(filteredApps) { app in
-                    NavigationLink(value: app.id) {
-                        TrackedAppRowView(app: app)
+                switch layoutMode {
+                case .grid:
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 14)], spacing: 14) {
+                            ForEach(filteredApps) { app in
+                                if isSelectMode {
+                                    Button {
+                                        toggleSelection(app.id)
+                                    } label: {
+                                        TrackedAppCardView(
+                                            app: app,
+                                            isSelectMode: true,
+                                            isSelected: selectedAppIDs.contains(app.id)
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    NavigationLink(value: app.id) {
+                                        TrackedAppCardView(app: app)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .contextMenu {
+                                        appContextMenu(for: app)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(16)
+                    }
+                case .list:
+                    List {
+                        ForEach(filteredApps) { app in
+                            if isSelectMode {
+                                Button {
+                                    toggleSelection(app.id)
+                                } label: {
+                                    TrackedAppRowView(
+                                        app: app,
+                                        isSelectMode: true,
+                                        isSelected: selectedAppIDs.contains(app.id)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                NavigationLink(value: app.id) {
+                                    TrackedAppRowView(app: app)
+                                }
+                                .contextMenu {
+                                    appContextMenu(for: app)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -218,6 +295,19 @@ struct MainWindowView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup {
+            if selection != .settings && !filteredApps.isEmpty {
+                Button {
+                    isSelectMode.toggle()
+                    if !isSelectMode {
+                        selectedAppIDs.removeAll()
+                    }
+                } label: {
+                    Label(
+                        isSelectMode ? AppStrings.string("common.done") : AppStrings.string("toolbar.select"),
+                        systemImage: isSelectMode ? "checkmark" : "checklist"
+                    )
+                }
+            }
             Button {
                 showingAddSheet = true
             } label: {
@@ -343,6 +433,105 @@ struct MainWindowView: View {
                 issues: [],
                 errorMessage: error.localizedDescription
             )
+        }
+    }
+
+    private var selectionBanner: some View {
+        HStack(spacing: 12) {
+            Button {
+                if selectedAppIDs.count == filteredApps.count {
+                    selectedAppIDs.removeAll()
+                } else {
+                    selectedAppIDs = Set(filteredApps.map(\.id))
+                }
+            } label: {
+                Label(
+                    selectedAppIDs.count == filteredApps.count
+                        ? AppStrings.string("toolbar.deselectAll")
+                        : AppStrings.string("toolbar.selectAll"),
+                    systemImage: selectedAppIDs.count == filteredApps.count ? "xmark.circle" : "checkmark.circle"
+                )
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
+            Text(AppStrings.format("toolbar.selectedCount", selectedAppIDs.count))
+                .font(.callout.weight(.medium))
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Button(role: .destructive) {
+                confirmingBatchDelete = true
+            } label: {
+                Label(AppStrings.string("toolbar.deleteSelected"), systemImage: "trash")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+            .controlSize(.small)
+            .disabled(selectedAppIDs.isEmpty)
+
+            Button(AppStrings.string("common.done")) {
+                isSelectMode = false
+                selectedAppIDs.removeAll()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .overlay(Divider(), alignment: .bottom)
+    }
+
+    private func toggleSelection(_ id: UUID) {
+        if selectedAppIDs.contains(id) {
+            selectedAppIDs.remove(id)
+        } else {
+            selectedAppIDs.insert(id)
+        }
+    }
+
+    @ViewBuilder
+    private func appContextMenu(for app: TrackedApp) -> some View {
+        if let urlString = app.appStoreURL ?? canonicalURLString(for: app),
+           let url = URL(string: urlString) {
+            Link(AppStrings.string("contextMenu.openInStore"), destination: url)
+            Button(AppStrings.string("contextMenu.copyLink")) {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(url.absoluteString, forType: .string)
+            }
+        }
+        Divider()
+        Button(role: .destructive) {
+            deletingSingleApp = app
+            confirmingSingleDelete = true
+        } label: {
+            Label(AppStrings.string("contextMenu.delete"), systemImage: "trash")
+        }
+    }
+
+    private func canonicalURLString(for app: TrackedApp) -> String? {
+        "https://apps.apple.com/\(app.countryCode)/app/id\(app.trackId)"
+    }
+
+    private func deleteSelectedApps() {
+        let toDelete = selectedAppIDs
+        Task {
+            if let error = await environment.delete(appIDs: toDelete) {
+                alertMessage = error
+            } else {
+                selectedAppIDs.removeAll()
+                isSelectMode = false
+            }
+        }
+    }
+
+    private func deleteApp(_ appID: UUID) {
+        Task {
+            if let error = await environment.delete(appID: appID) {
+                alertMessage = error
+            }
         }
     }
 }

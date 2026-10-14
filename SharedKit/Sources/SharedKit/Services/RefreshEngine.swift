@@ -44,6 +44,35 @@ public enum RegionReplaceResult: Sendable, Equatable {
     case failed(message: String)
 }
 
+/// Result of batch-replacing the storefront of all tracked apps.
+public struct BulkRegionChangeResult: Sendable, Equatable {
+    public var targetCountry: String
+    public var updatedCount: Int
+    public var unchangedCount: Int
+    public var unavailableCount: Int
+    public var duplicateCount: Int
+    public var failedCount: Int
+    public var failureMessages: [String]
+
+    public init(
+        targetCountry: String,
+        updatedCount: Int = 0,
+        unchangedCount: Int = 0,
+        unavailableCount: Int = 0,
+        duplicateCount: Int = 0,
+        failedCount: Int = 0,
+        failureMessages: [String] = []
+    ) {
+        self.targetCountry = targetCountry
+        self.updatedCount = updatedCount
+        self.unchangedCount = unchangedCount
+        self.unavailableCount = unavailableCount
+        self.duplicateCount = duplicateCount
+        self.failedCount = failedCount
+        self.failureMessages = failureMessages
+    }
+}
+
 /// The shared price-check pipeline used by the main app (manual refresh) and by
 /// the background helper (scheduled runs). Serialized across processes with an
 /// advisory file lock and idempotent notifications.
@@ -270,6 +299,116 @@ public final class RefreshEngine: @unchecked Sendable {
             return .replaced(snapshot)
         } catch {
             return .failed(message: error.localizedDescription)
+        }
+    }
+
+    /// Replaces the storefront for all tracked apps to the given country code.
+    /// Apps already in that storefront are kept unchanged. Apps not available in
+    /// the target storefront are left in their existing region.
+    public func replaceRegionForAll(to newCountryCode: String) async -> BulkRegionChangeResult {
+        let country = StoreCountry.normalized(newCountryCode)
+        guard SharedConstants.isSupportedCountry(country) else {
+            return BulkRegionChangeResult(
+                targetCountry: newCountryCode,
+                failedCount: 1,
+                failureMessages: ["Unsupported storefront \"\(newCountryCode)\"."]
+            )
+        }
+
+        do {
+            let all = try await store.allSnapshots()
+            guard !all.isEmpty else {
+                return BulkRegionChangeResult(targetCountry: country)
+            }
+
+            var updatedCount = 0
+            var unchangedCount = 0
+            var unavailableCount = 0
+            var duplicateCount = 0
+            var failedCount = 0
+            var failures: [String] = []
+
+            var toLookup: [TrackedAppSnapshot] = []
+
+            for app in all {
+                if app.countryCode == country {
+                    unchangedCount += 1
+                    continue
+                }
+                if try await store.contains(trackId: app.trackId, countryCode: country) {
+                    duplicateCount += 1
+                    failures.append("\(app.name): Already tracked in \(country.uppercased())")
+                    continue
+                }
+                toLookup.append(app)
+            }
+
+            guard !toLookup.isEmpty else {
+                return BulkRegionChangeResult(
+                    targetCountry: country,
+                    updatedCount: 0,
+                    unchangedCount: unchangedCount,
+                    unavailableCount: 0,
+                    duplicateCount: duplicateCount,
+                    failedCount: 0,
+                    failureMessages: failures
+                )
+            }
+
+            let outcome = await fetcher.lookup(appIds: toLookup.map(\.trackId), country: country)
+            let byId = Dictionary(outcome.apps.map { ($0.trackId, $0) }, uniquingKeysWith: { first, _ in first })
+
+            for app in toLookup {
+                guard let result = byId[app.trackId] else {
+                    unavailableCount += 1
+                    failures.append("\(app.name): Not available in \(country.uppercased()) storefront")
+                    continue
+                }
+                guard let price = result.price, let currency = result.currency,
+                      let formatted = result.formattedPrice else {
+                    unavailableCount += 1
+                    failures.append("\(app.name): Missing price in \(country.uppercased()) storefront")
+                    continue
+                }
+
+                do {
+                    try await store.delete(appID: app.id)
+                    let draft = NewTrackedAppDraft(
+                        trackId: app.trackId,
+                        countryCode: country,
+                        name: result.name,
+                        developerName: result.developerName ?? app.developerName,
+                        artworkURL: result.artworkURL ?? app.artworkURL,
+                        appStoreURL: result.appStoreURL ?? app.appStoreURL,
+                        price: price,
+                        formattedPrice: formatted,
+                        currency: currency
+                    )
+                    _ = try await store.insert(draft, now: now())
+                    updatedCount += 1
+                } catch {
+                    failedCount += 1
+                    failures.append("\(app.name): \(error.localizedDescription)")
+                }
+            }
+
+            log("bulk storefront replaced to \(country): updated=\(updatedCount) unchanged=\(unchangedCount) unavailable=\(unavailableCount)")
+
+            return BulkRegionChangeResult(
+                targetCountry: country,
+                updatedCount: updatedCount,
+                unchangedCount: unchangedCount,
+                unavailableCount: unavailableCount,
+                duplicateCount: duplicateCount,
+                failedCount: failedCount,
+                failureMessages: failures
+            )
+        } catch {
+            return BulkRegionChangeResult(
+                targetCountry: country,
+                failedCount: 1,
+                failureMessages: [error.localizedDescription]
+            )
         }
     }
 

@@ -16,7 +16,7 @@ struct AppDropApp: App {
         }
         .commands {
             CommandGroup(replacing: .newItem) {}
-            CommandMenu(AppStrings.string("menu.title")) {
+            CommandGroup(after: .toolbar) {
                 Button(AppStrings.string("toolbar.refresh")) {
                     Task { await environment.refreshAll() }
                 }

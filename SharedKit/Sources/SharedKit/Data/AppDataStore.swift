@@ -141,6 +141,16 @@ public actor AppDataStore {
         try modelContext.save()
     }
 
+    public func delete(appIDs: Set<UUID>) throws {
+        guard !appIDs.isEmpty else { return }
+        for appID in appIDs {
+            if let app = try fetchApp(appID: appID) {
+                modelContext.delete(app)
+            }
+        }
+        try modelContext.save()
+    }
+
     /// Applies one price evaluation: updates the current state, appends a
     /// history record when required and returns what changed.
     @discardableResult

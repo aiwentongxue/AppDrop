@@ -110,6 +110,8 @@ struct LastCheckedLine: View {
 
 struct TrackedAppCardView: View {
     let app: TrackedApp
+    var isSelectMode: Bool = false
+    var isSelected: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -127,6 +129,11 @@ struct TrackedAppCardView: View {
                     }
                 }
                 Spacer(minLength: 0)
+                if isSelectMode {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+                }
             }
             PriceWithCurrency(formattedPrice: app.formattedPrice, currency: app.currency)
             VStack(alignment: .leading, spacing: 3) {
@@ -144,17 +151,30 @@ struct TrackedAppCardView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color(nsColor: .controlBackgroundColor)))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(.quaternary, lineWidth: 1))
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isSelected ? Color.accentColor.opacity(0.08) : Color(nsColor: .controlBackgroundColor))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+        )
         .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 struct TrackedAppRowView: View {
     let app: TrackedApp
+    var isSelectMode: Bool = false
+    var isSelected: Bool = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
+            if isSelectMode {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+            }
             TrackedAppIconView(artworkURL: app.artworkURL, size: 36)
             VStack(alignment: .leading, spacing: 3) {
                 Text(app.name)
