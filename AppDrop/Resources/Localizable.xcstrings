@@ -2176,13 +2176,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Applies to newly added apps only."
+            "value": "Default region only affects newly added apps. To change globally, use the option on the right."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "仅影响新添加的应用。"
+            "value": "默认区域仅影响新添加的应用，如需全局更改请点击右侧选项"
           }
         }
       }
@@ -2862,7 +2862,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "将所有App更改到默认地区"
+            "value": "把所有App更改到默认地区"
           }
         }
       }

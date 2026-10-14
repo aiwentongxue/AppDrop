@@ -27,24 +27,22 @@ struct SettingsView: View {
                         Text(AppStrings.regionLabel(code)).tag(code)
                     }
                 }
-                Text(AppStrings.string("settings.defaultRegionCaption"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack(alignment: .center, spacing: 12) {
+                    Text(AppStrings.string("settings.defaultRegionCaption"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
 
-                HStack(spacing: 8) {
+                    Spacer(minLength: 16)
+
+                    if changingAllRegions {
+                        ProgressView().controlSize(.small)
+                    }
+
                     Button(AppStrings.string("settings.changeAllToDefaultRegion")) {
                         confirmingChangeAllRegions = true
                     }
                     .disabled(changingAllRegions || busy || environment.refresh?.isRefreshing == true)
-
-                    if changingAllRegions {
-                        ProgressView().controlSize(.small)
-                        Text(AppStrings.string("settings.changingRegions"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
                 }
-                .padding(.top, 4)
             }
 
             Section(AppStrings.string("settings.notifications")) {

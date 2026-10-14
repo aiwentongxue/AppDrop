@@ -79,8 +79,12 @@ struct MainWindowView: View {
         NavigationSplitView {
             List(selection: $selection) {
                 ForEach(SidebarItem.allCases) { item in
-                    Label(AppStrings.string(item.titleKey), systemImage: item.systemImage)
-                        .tag(item)
+                    HStack(spacing: 8) {
+                        Image(systemName: item.systemImage)
+                            .frame(width: 18, alignment: .center)
+                        Text(AppStrings.string(item.titleKey))
+                    }
+                    .tag(item)
                 }
             }
             .navigationSplitViewColumnWidth(min: 190, ideal: 210)
